@@ -1,0 +1,91 @@
+<div style="width: 500px;">
+  <form [formGroup]="newQuestion" (ngSubmit)="submit(newQuestion.value)">
+    <mat-card>
+      <mat-card-title style="padding: 12px;">
+        Add a New Questions
+      </mat-card-title>
+      <mat-card-content>
+        <div>
+          <mat-form-field>
+            <mat-label>Type</mat-label>
+            <mat-select formControlName="type">
+              <mat-option value="options">Checkbox List</mat-option>
+              <mat-option value="text">Paragraph</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-form-field>
+            <mat-label>Question</mat-label>
+            <input
+              formControlName="title"
+              matInput
+              placeholder="Type question"
+            />
+          </mat-form-field>
+        </div>
+
+        <div *ngIf="newQuestion.value.type == 'options'">
+          <ng-container formArrayName="answerList">
+            <ng-container
+              *ngFor="let answerForm of answerListControl; let i = index "
+            >
+              <div [formGroup]="answerForm">
+                <mat-form-field class="example-form-field">
+                  <mat-label>Answer</mat-label>
+                  <input
+                    formControlName="label"
+                    matInput
+                    placeholder="Type answer"
+                  />
+
+                  <button
+                    *ngIf="answerForm.value.label"
+                    matSuffix
+                    mat-icon-button
+                    aria-label="Clear"
+                    (click)="deleteAnswer(i)"
+                  >
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </mat-form-field>
+              </div>
+            </ng-container>
+            <button mat-button type="button" (click)="addNewAnswer()">
+              Add new answer
+            </button>
+          </ng-container>
+        </div>
+        <hr />
+
+        <div *ngIf="newQuestion.value.type == 'options'">
+          <mat-checkbox formControlName="custom">
+            Allow user to specify their own answer
+          </mat-checkbox>
+        </div>
+
+        <div>
+          <mat-checkbox formControlName="required">
+            This field is required
+          </mat-checkbox>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button
+          [disabled]="!newQuestion.valid"
+          mat-raised-button
+          color="primary"
+          type="submit"
+        >
+          Submit
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </form>
+</div>
+
+<style>
+  mat-form-field {
+    width: 100%;
+  }
+</style>

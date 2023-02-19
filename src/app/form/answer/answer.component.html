@@ -1,0 +1,20 @@
+<div style="margin-left: auto; margin-right: auto; max-width: 700px;">
+  <mat-card>
+    <mat-card-content>
+      My result form
+
+      <div *ngFor="let question of questions">
+        <h4>{{ question.title }}</h4>
+
+        <p>{{ question.result }}</p>
+      </div>
+      <a routerLink="/form/build">Back to Forms Builder</a>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<style>
+  mat-form-field {
+    width: 100%;
+  }
+</style>
