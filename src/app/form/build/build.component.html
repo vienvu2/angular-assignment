@@ -21,28 +21,24 @@
 
           <mat-card *ngIf="question.type === 'options'">
             <mat-card-content>
-              <mat-radio-group [formControlName]="question.title">
-                <p *ngFor="let answer of question.answerList">
-                  <mat-radio-button [value]="answer.label">
-                    {{ answer.label }}
-                  </mat-radio-button>
+              <mat-radio-group [formArrayName]="question.title">
+                <p *ngFor="let option of question.answerList">
+                  <mat-checkbox [formControlName]="option.label">
+                    {{ option.label }}
+                  </mat-checkbox>
                 </p>
 
                 <p *ngIf="question.custom">
-                  <mat-radio-button [value]="question.customText">
+                  <mat-checkbox
+                    [(ngModel)]="question.isOther"
+                    [ngModelOptions]="{ standalone: true }"
+                  >
                     Other
-                  </mat-radio-button>
+                  </mat-checkbox>
                 </p>
 
-                <mat-form-field>
-                  <input
-                    matInput
-                    [(ngModel)]="question.customText"
-                    [ngModelOptions]="{ standalone: true }"
-                    (ngModelChange)="
-                      setValue(question.title, question.customText || '')
-                    "
-                  />
+                <mat-form-field *ngIf="question.isOther">
+                  <input matInput formControlName="other" />
                 </mat-form-field>
               </mat-radio-group>
             </mat-card-content>
@@ -55,7 +51,7 @@
         </button>
       </mat-card-actions>
 
-      <button mat-button type="submit" [disabled]="!answer.valid">
+      <button mat-button type="submit" [disabled]="checkValidate()">
         Review my answers
 
         <mat-icon>arrow-right</mat-icon>

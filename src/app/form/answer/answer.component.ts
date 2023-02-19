@@ -16,7 +16,7 @@ export class AnswerComponent implements OnInit {
       Object.keys(params).map((key) => {
         this.questions.push({
           title: key,
-          result: params[key],
+          result: params[key].split('___'),
         })
       })
     })

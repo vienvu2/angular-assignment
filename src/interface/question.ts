@@ -5,8 +5,8 @@ export interface IQuestion {
   required: boolean
   custom: boolean
   answerList?: IAnswer[]
+  isOther: boolean
   customText?: string
-
 }
 export interface IAnswer {
   label: string
@@ -14,5 +14,5 @@ export interface IAnswer {
 
 export interface IResult {
   title: string
-  result: string
+  result: string[]
 }

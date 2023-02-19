@@ -35,26 +35,84 @@ export class BuildComponent implements OnInit {
   addNew() {
     const dialogRef = this.dialog.open(DialogNewQuestion)
 
-    dialogRef.afterClosed().subscribe((result) => {
+    dialogRef.afterClosed().subscribe((result: IQuestion) => {
       this.questions = this.questions.concat(result)
 
-      this.questions.forEach((item) => {
-        if (item.required) {
-          this.answer.addControl(
-            item.title,
-            new FormControl('', Validators.required),
-          )
-        } else {
-          this.answer.addControl(item.title, new FormControl(''))
+      if (result.type == 'options' && result.answerList) {
+        const group: any = {}
+        result.answerList.map((item) => {
+          group[item.label] = ['']
+        })
+
+        if (result.custom) {
+          group.other = ''
         }
-      })
+        this.answer.addControl(result.title, this.fb.group(group))
+      } else {
+        this.answer.addControl(
+          result.title,
+          new FormControl(
+            '',
+            result.required ? Validators.required : Validators.nullValidator,
+          ),
+        )
+      }
+
+      console.log('this.answer', this.answer.controls)
     })
   }
   submit(values: any) {
-    this.router.navigate(['form', 'answer'], { queryParams: values })
+    const result: any = {}
+    Object.keys(values).map((key) => {
+      if (typeof values[key] === 'object') {
+        result[key] = this.getDataObj(values[key]).join('___')
+      } else {
+        result[key] = values[key]
+      }
+    })
+    this.router.navigate(['form', 'answer'], { queryParams: result })
+  }
+
+  getDataObj(values: any) {
+    const re2 = Object.keys(values)
+      .map((k2) => {
+        if (k2 == 'other' && values.other) {
+          return values.other
+        }
+        if (values[k2]) {
+          return k2
+        }
+      })
+      .filter((a) => a)
+
+    return re2
   }
   setValue(name: string, value: string) {
     this.answer.setValue({ [name]: value })
+  }
+  checkValidate() {
+    //true => failed
+    if (this.questions.length == 0) {
+      return true
+    }
+    const questionValidate = this.questions.filter((a) => a.required)
+    let result = false
+    questionValidate.forEach((question) => {
+      const values: any = this.answer.value || {}
+      if (question.type == 'text') {
+        if (!values[question.title]) {
+          result = true
+        }
+      }
+
+      if (question.type == 'options') {
+        if (this.getDataObj(values[question.title]).length == 0) {
+          result = true
+        }
+      }
+    })
+
+    return result
   }
 }
 
@@ -71,10 +129,10 @@ export class DialogNewQuestion {
     @Inject(MAT_DIALOG_DATA) public data: IQuestion,
   ) {
     this.newQuestion = this.fb.group({
-      type: ['', Validators.required],
+      type: ['options', Validators.required],
       title: ['', Validators.required],
-      required: [''],
-      custom: [''],
+      required: [false],
+      custom: [false],
       answerList: this.fb.array([]),
     })
   }
